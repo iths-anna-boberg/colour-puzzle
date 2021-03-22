@@ -19,6 +19,10 @@ h1{
   width: 150px;
 }
 
+.box[draggable]:hover {
+  cursor: pointer;
+}
+
 .grid{
   margin: 5rem;
   display: grid;

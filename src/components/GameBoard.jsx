@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Box from './Box';
 
-const GameBoard = ({ boardArray, dispatch })=>{
+const GameBoard = ({ blackBoxIndex, gameArray, setBoxes })=>{
 
-    const [gameArray, setGameArray] = useState(boardArray);
-    const [blackBoxIndex, setBlackBoxIndex] = useState(boardArray.findIndex(box => box.id === 25));
     const [isTopEdge, setTopEdge] = useState(false);
     const [isLeftEdge, setLeftEdge] = useState(false);
     const [isRightEdge, setRightEdge] = useState(false);
@@ -14,10 +12,10 @@ const GameBoard = ({ boardArray, dispatch })=>{
     const [dragRight, setDragRight] = useState(0);
     const [dragBottom, setDragBottom] = useState(0);
     const [dragLeft, setDragLeft] = useState(0);
-    // const [isDraggable, setIsDraggable] = useState(false);
+    const [dragId, setDragId] = useState(null);
+
     const width = 5;
     let noEdges = !isBottomEdge && !isLeftEdge && !isRightEdge && !isTopEdge;
-    console.log(gameArray)
     useEffect(()=>{
         checkBlackBox()
     })
@@ -72,17 +70,12 @@ const GameBoard = ({ boardArray, dispatch })=>{
 
             }
 
-        console.log('top? ',isTopEdge)
-        console.log('bottom? ',isBottomEdge)
-        console.log('right? ',isRightEdge)
-        console.log('left? ',isLeftEdge)
+        // console.log('top? ',isTopEdge)
+        // console.log('bottom? ',isBottomEdge)
+        // console.log('right? ',isRightEdge)
+        // console.log('left? ',isLeftEdge)
         checkIsDraggable();
     }, [noEdges, isBottomEdge, isTopEdge, isRightEdge, isLeftEdge])
-
-    console.log(blackBoxIndex)
-
-    // const dragClass = noEdges? 'draggable' : '';
-
 
     //kolla om den svarta lådan ligger i kanten:
     const checkBlackBox = ()=>{
@@ -100,13 +93,56 @@ const GameBoard = ({ boardArray, dispatch })=>{
         }
     }
 
+    
+
+  const handleDragEnter = e => {
+    console.log('enterdrop: ', e.target.id)
+    e.preventDefault();
+  
+  };
+
+const handleDrag = e => {
+
+    console.log('dragging: ' , e.target.id)
+    setDragId(e.target.id);
+}
+
+const handleDrop = e => {
+    console.log(`dragID: ${dragId}`)
+    console.log(`e target: ${e.target.id}`)
+    const dragBox = gameArray.find(box => box.id === parseInt(dragId));
+    const dropBox = gameArray.find(box => box.id === parseInt(e.target.id));
+
+    console.log(`dragbox order: ${dragBox.order}`)
+    console.log(`dropbox order: ${dropBox.order}`)
+
+    const dragBoxOrder = dragBox.order;
+    const dropBoxOrder = dropBox.order;
+
+
+    const newBoxState = gameArray.map((box) => {
+        if (box.id === dragId) {
+            box.order = dropBoxOrder;
+        }
+        if (box.id === e.target.id) {
+            box.order = dragBoxOrder;
+        }
+    return box;
+    });
+    console.log(newBoxState)
+
+    setBoxes(newBoxState);
+}
+
+
+
     return(
         <div className="grid" id="grid">
             {gameArray.map((box)=>
             box.id === dragBottom || box.id === dragRight || box.id === dragLeft || box.id === dragTop?
-            <Box key={box.id} colour={box.colour} dispatch={dispatch} isDraggable={true} boxId={box.id} />
+            <Box key={box.id} gridOrder={box.order} colour={box.colour} boxes={gameArray} setBoxes={setBoxes} isDraggable={true} boxId={box.id} handleDrag={handleDrag}  />
             :
-            <Box key={box.id} colour={box.colour} dispatch={dispatch} isDraggable={false} boxId={box.id} />
+            <Box key={box.id} gridOrder={box.order} colour={box.colour} boxes={gameArray} setBoxes={setBoxes} isDraggable={false} boxId={box.id} handleDrop={handleDrop} handleDragEnter={handleDragEnter} />
             )}
         </div>
     )

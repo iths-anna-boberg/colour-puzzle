@@ -1,9 +1,8 @@
-import React, { useReducer} from 'react';
+import React, { useState, useReducer, useEffect } from 'react';
 import shuffle from './functions/Shuffle';
 import GameBoard from './components/GameBoard';
 
-const boxArray = [
-  {id: 1, colour:'blue'},
+const boxArray = [ {id: 1, colour:'blue'},
   {id: 2, colour:'blue'},
   {id: 3, colour:'blue'},
   {id: 4, colour:'blue'},
@@ -27,34 +26,35 @@ const boxArray = [
   {id: 22, colour:'purple'},
   {id: 23, colour:'purple'},
   {id: 24, colour:'purple'},
-  {id: 25, colour:'black'}
+  {id: 25, colour:'black'},
 ];
 
 
 
 const shuffledArray = shuffle(boxArray);
 
-const boxes = shuffledArray.map((val, index) => ({...val, order: index}));
-
-const reducer = (state, action) => {
-
-  switch(action.type) {
-    case 'in-drop-zone':
-      console.log('is in drop zone');
-    default:
-      return state;
-  }
-}
+const orderedBoxes = shuffledArray.map((val, index) => ({...val, order : index}));
 
 function App() {
 
-  const [boxesArr, dispatch] = useReducer(reducer, boxes)
+  const [boxes, setBoxes] = useState(orderedBoxes);
+  const [blackBoxIndex, setBlackBoxIndex] = useState(orderedBoxes.find(box => box.id === 25).order);
+  
 
-  console.log(boxesArr)
+
+  useEffect(()=> {
+    if (boxes) {
+
+      setBlackBoxIndex(boxes.find(box => box.id === 25).order)
+    }
+  }, [boxes])
+
+  
+
   return (
     <div className="App">
       <h1>Colour puzzle</h1>
-      {boxesArr ? <GameBoard boardArray={boxesArr} dispatch={dispatch}/> : null}
+       <GameBoard blackBoxIndex={blackBoxIndex} gameArray={boxes} setBoxes={setBoxes}  /> 
     </div>
   );
 }

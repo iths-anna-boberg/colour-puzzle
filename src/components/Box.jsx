@@ -1,18 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-const Box = ({colour, isDraggable, boxId, dispatch})=>{
-
-    const handleDragEnter = e => {
-        e.preventDefault();
-        e.stopPropagation();
-        dispatch({type:'in-drop-zone'})
-      };
+const Box = ({colour, isDraggable, gridOrder, boxId, handleDragEnter, handleDrag, handleDrop})=>{
 
     return(
         <>
         {isDraggable 
-        ?   <div draggable className={colour} id={boxId}></div> 
-        :   (boxId === 25) ? <div onDragEnter={handleDragEnter} className={colour} id={boxId}></div> : <div className={colour} id={boxId}></div>
+        ?   <div draggable onDrag={handleDrag} order={gridOrder} className={`box ${colour}`} id={boxId}></div> 
+        :   (boxId === 25) ? <div onDragOver={handleDragEnter} onDrop={handleDrop} className={`box ${colour}`} order={gridOrder} id={boxId}></div> : <div className={`box ${colour}`} order={gridOrder} id={boxId}></div>
         }
         </>
     )
